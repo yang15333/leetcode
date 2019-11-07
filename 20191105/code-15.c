@@ -9,6 +9,8 @@ int** threeSum(int* nums, int numsSize, int* returnSize, int** returnColumnSizes
 	int i = 0, j = 0, t = 0;
 	int head = 0, end = numsSize - 1;
 	int lhead = 0, lend = 0, nhead = 0, nend = 0;
+	int ptr = 0;
+	int a[100] = {0};
 
 	for (i = 0; i < numsSize - 1; ++i)
 	{
@@ -22,70 +24,53 @@ int** threeSum(int* nums, int numsSize, int* returnSize, int** returnColumnSizes
 			}
 		}
 	}
-	*returnColumnSizes = malloc(numsSize * sizeof(int));
+	*returnColumnSizes = malloc(100000);
+	int **ret  = (int **)malloc(100000);
 
 	while (end > head)
 	{
-		lhead = head;
-		nhead = head;
-		for (; head < end -1; head++)
+		lend = head+2;
+		while (lend <= end)
 		{
-			if (nums[head] == nums[lhead])
+			i = head + 1;
+			for (; i < lend; i++)
 			{
-				nhead = head;
-				continue;
-			}
-			for (i = head + 1; i < end; ++i)
-			{
-				if ((nums[head] + nums[end]) == -nums[i])
+				if (nums[i] + nums[lend] + nums[head] == 0)
 				{
-					(*returnSize)++;
-					(*returnColumnSizes)[3 * (*returnSize) - 1] = nums[head];
-					(*returnColumnSizes)[3 * (*returnSize) - 2] = nums[end];
-					(*returnColumnSizes)[3 * (*returnSize) - 3] = nums[i];
-					goto a;
+					if (ptr > 0 && (nums[head] == ret[ptr-1][0] && nums[i] == ret[ptr-1][1]))
+						continue;
+					ret[ptr] = malloc(sizeof(int) * 3);
+					ret[ptr][0] = nums[head];
+					ret[ptr][1] = nums[i];
+					ret[ptr][2] = nums[lend];
+					(*returnColumnSizes)[ptr] = 3;
+					ptr++;
 				}
 			}
+			lend++;
+			
 		}
-a:
-		head = nhead + 1;
-		lend = end;
-		nend = end;		
-		for (; end > head + 1; end--)
+		do
 		{
-			if (nums[end] == nums[lend])
-			{
-				nend = end;
-				continue;
-			}
-			for (i = end - 1; i > head; --i)
-			{
-				if ((nums[head] + nums[end]) == -nums[i])
-				{
-					(*returnSize)++;
-					(*returnColumnSizes)[3 * (*returnSize) - 1] = nums[head];
-					(*returnColumnSizes)[3 * (*returnSize) - 2] = nums[end];
-					(*returnColumnSizes)[3 * (*returnSize) - 3] = nums[i];
-					goto b;
-				}
-			}
-		}
-b:
-		end = nend - 1;
+			head++;
+		}while(head < end && nums[head] == nums[head+1]);
+
 	}
+	*returnSize = ptr;
+	return ret;
 }
 
 
 
 int main(void)
 {
-	int nums[10] = {-1,0,1,2,-1,-4};
+	int nums[] = {-4,-2,-2,-2,0,1,2,2,2,3,3,4,4,6,6};
 	int *retnums = NULL;
 	int ret_len = 0, i = 0;
-	threeSum(nums, 10, &ret_len, &retnums);
+	int **ret = threeSum(nums, sizeof(nums)/sizeof(nums[0]), &ret_len, &retnums);
 	for(i = 0; i < ret_len; i++)
 	{
-		printf("[%d, %d, %d]\n", retnums[i*3], retnums[i*3+1], retnums[i*3+2]);
+		printf("[%d, %d, %d]\n", ret[i][0], ret[i][1], ret[i][2]);
 	}
 	free(retnums);
 	return 0;
